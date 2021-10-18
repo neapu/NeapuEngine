@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.15)
+project(NeapuEngine CXX)
+file(GLOB SRC_FILES "*.cpp")
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_compile_definitions(NEAPU_ENGINE_EXPORTS)
+endif ()
+
+# add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+target_link_libraries(${PROJECT_NAME} d2d1 windowscodecs dwrite)
