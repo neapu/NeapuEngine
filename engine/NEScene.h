@@ -12,10 +12,10 @@ class NEAPU_ENGINE_EXPORT Scene{
 public:
     Scene(String strName);
     String name() {return m_strName;}
-    bool addGameObject(GameObject* pGameObject);
+    GameObject* rootGameObject() { return m_pRootGameObject; }
     void redner(ID2D1HwndRenderTarget* pRenderTarget, std::map<int, Image*>& imageList);
 protected:
-    std::map<String, GameObject*> m_GameObjectList;
+    GameObject* m_pRootGameObject;
     Camara* m_pCamara;
     String m_strName;
 };

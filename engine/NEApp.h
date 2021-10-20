@@ -16,7 +16,7 @@ class Scene;
 class NEAPU_ENGINE_EXPORT App{
 public:
     App(int argc, char** argv);
-    int init(HINSTANCE hIns);
+    int init();
     int run();
 
 public:
@@ -24,13 +24,13 @@ public:
     int addImage(String strPath);
 
 protected:
-    void onInit();
-    void onRender();
-    void onResize();
+    void onInit(HWND hWnd);
+    void onRender(HWND hWnd);
+    void onResize(HWND hWnd);
 
     void tick();
 private:
-    LRESULT widgetProc(UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     friend LRESULT CALLBACK ::__WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
     int m_argc;
