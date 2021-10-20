@@ -14,6 +14,9 @@
 ### GameObject
 场景中的物品
 
+### Image
+用于加载位图
+
 ## 工具类
 
 ### String
