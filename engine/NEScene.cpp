@@ -23,3 +23,13 @@ void Scene::redner(ID2D1HwndRenderTarget* pRenderTarget, std::map<int, Image*>& 
     m_pRootGameObject->render(pRenderTarget, m_pCamara, imageList);
     pRenderTarget->EndDraw();
 }
+
+void Scene::tick() 
+{
+    m_pRootGameObject->tick();
+}
+
+void Scene::fixedTick() 
+{
+    m_pRootGameObject->fixedTick();
+}

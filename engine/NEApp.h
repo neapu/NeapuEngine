@@ -5,6 +5,7 @@
 #include "NEString.h"
 #include "export.h"
 #include "NEImage.h"
+#pragma warning(disable: 4251)//禁用stl实例类导出警告
 
 struct ID2D1Factory;
 struct ID2D1HwndRenderTarget;
@@ -18,7 +19,9 @@ public:
     App(int argc, char** argv);
     int init();
     int run();
+    static App* instance() {return m_pInstance;}
 
+    bool isKeyDown(unsigned long keyCode);
 public:
     bool addScene(Scene* scene);
     int addImage(String strPath);
@@ -29,12 +32,14 @@ protected:
     void onResize(HWND hWnd);
 
     void tick();
+    void fixedTick();
 private:
     LRESULT widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     friend LRESULT CALLBACK ::__WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 private:
     int m_argc;
     char** m_argv;
+    static App* m_pInstance;
     HWND m_hwnd;
     std::map<String, Scene*> m_SceneList;
     String m_strCurrentSceneName;
@@ -43,6 +48,10 @@ private:
     ID2D1HwndRenderTarget* m_pRenderTarget;
     IWICImagingFactory* m_pIWICFactory;
     std::map<int, Image*> m_ImageList;
+    //标记哪些按键被按下
+    //对应虚拟键码为1则为按下
+    //虚拟键码：https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+    unsigned char m_keyMap[256];
 };
 // LRESULT __WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }

@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <algorithm>
 #include <objbase.h>
+#include <synchapi.h>
 #include <winuser.h>
 #include "NEScene.h"
 #include <d2d1.h>
@@ -10,10 +11,11 @@
 using namespace NeapuEngine;
 #define NE_ASSERT(b, msg) if(FAILED(b)){MessageBox(nullptr, msg, "error", 0);exit(-1);}
 
-App* g_pInstance = nullptr;
+// App* g_pInstance = nullptr;
+App* App::m_pInstance = nullptr;
 extern "C" LRESULT CALLBACK __WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 {
-    return g_pInstance->widgetProc(hWnd, msg, wParam, lParam);
+    return App::instance()->widgetProc(hWnd, msg, wParam, lParam);
 }
 
 
@@ -26,7 +28,14 @@ App::App(int argc, char** argv)
     , m_hwnd(nullptr)
     , m_pIWICFactory(nullptr)
 {
-    g_pInstance = this;
+    // g_pInstance = this;
+    m_pInstance = this;
+    memset(m_keyMap, 0, 256);
+}
+
+bool App::isKeyDown(unsigned long keyCode) 
+{
+    return m_keyMap[keyCode]==1;
 }
 
 int NeapuEngine::App::init()
@@ -67,14 +76,18 @@ int NeapuEngine::App::init()
 
 int App::run() 
 {
-    
-
+    int n = SetTimer(nullptr, 1, 1000, [](HWND hwnd, UINT, UINT_PTR, DWORD){
+        int i=0;
+    });
     ShowWindow(m_hwnd, SW_SHOW);
     UpdateWindow(m_hwnd);
 
     MSG msg = {0};
     while (msg.message != WM_QUIT) {
         if(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)){
+            if(msg.message == WM_TIMER){
+                Sleep(1);
+            }
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
@@ -137,6 +150,7 @@ void App::onInit(HWND hWnd)
         IID_PPV_ARGS(&m_pIWICFactory)
     );
     NE_ASSERT(hr, "Create IWICFactory failed!");
+    
 }
 
 void App::onRender(HWND hWnd)
@@ -153,7 +167,16 @@ void App::onResize(HWND hWnd)
 
 void App::tick() 
 {
-    
+    if(m_pCurrentScene){
+        m_pCurrentScene->tick();
+    }
+}
+
+void App::fixedTick() 
+{
+    if(m_pCurrentScene){
+        m_pCurrentScene->fixedTick();
+    }
 }
 
 
@@ -161,13 +184,26 @@ void App::tick()
 LRESULT App::widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg) {
-    case WM_CREATE:onInit(hWnd); return 0; break;
-    case WM_PAINT:onRender(hWnd); return 0; break;
-    case WM_SIZE:onResize(hWnd); return 0; break;
+    case WM_CREATE:onInit(hWnd);  break;
+    case WM_PAINT:onRender(hWnd);  break;
+    case WM_SIZE:onResize(hWnd);  break;
+    case WM_TIMER:
+        if(wParam==1){
+            fixedTick();
+        }
+        break;
+    case WM_KEYDOWN:{
+        m_keyMap[wParam]=1;
+    }break;
+    case WM_KEYUP:{
+        m_keyMap[wParam]=0;
+    }break;
     case WM_DESTROY:
         PostQuitMessage(0);
-        return 0;
+        break;
+    default:
+        return DefWindowProc(hWnd, msg, wParam, lParam);
     }
-    return DefWindowProc(hWnd, msg, wParam, lParam);
+    return 0;
 }
 

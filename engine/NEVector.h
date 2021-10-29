@@ -8,6 +8,8 @@ struct NEAPU_ENGINE_EXPORT Vector2{
     float y;
     Vector2 operator+(const Vector2& v2);
     Vector2 operator-(const Vector2& v2);
+    Vector2 operator*(float f);
+    Vector2 operator/(float f);
 };
 }
 #endif // __NEVECTOR_H__

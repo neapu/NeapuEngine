@@ -12,23 +12,29 @@ class Image;
 class NEAPU_ENGINE_EXPORT GameObject{
 public:
     
-    GameObject(String name, int nLayer = 0, GameObject* parent = nullptr);
+    GameObject(String strName, GameObject* pParent = nullptr);
     virtual ~GameObject();
 
     Vector2 position() {return m_vPosition;}
     Vector2 size() {return m_vSize;}
     String name() { return m_strName; }
     GameObject* child(const String& name) { return m_ChildrenList[name]; }
+    void setVelocity(const Vector2& vel) {m_vVelocity=vel;}
     int layer() { return m_nLayer; }
+    void setLayer(int nLayer) { m_nLayer = nLayer; }
     virtual void render(ID2D1HwndRenderTarget* pRenderTarget, const Camara* camara, std::map<int, Image*>& imageList);
+    virtual void tick();
+    virtual void fixedTick();
 protected:
     void addChild(GameObject* pChild);
     void removeChild(GameObject* pChild);
+    bool isKeyDown(unsigned long keyCode);
 
 protected:
     String m_strName;
     Vector2 m_vPosition;//左上角位置
     Vector2 m_vSize;//宽高
+    Vector2 m_vVelocity;//速度
     GameObject* m_pParent;
     std::map<String, GameObject*> m_ChildrenList;
     int m_nLayer;//组内分层

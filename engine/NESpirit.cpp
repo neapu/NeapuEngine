@@ -4,17 +4,24 @@
 #include "NEImage.h"
 using namespace NeapuEngine;
 
-Spirit::Spirit(String name, int nImgId, const Rect& rcImageRect, int nLayer, GameObject* pParam)
-	: GameObject(name, nLayer, pParam)
-	, m_nImageId(nImgId)
-	, m_rcImageRect(rcImageRect)
+Spirit::Spirit(String strName, GameObject* pParent)
+	: GameObject(strName, pParent)
+	, m_nImageId(-1)
+    , m_fPixelsPerMeter(100.f)
 {
-	m_vSize.x = rcImageRect.width/100.f;
-	m_vSize.y = rcImageRect.height/100.f;
+}
+
+void Spirit::setImage(int nId, const Rect& rcImageRect) 
+{
+    m_nImageId=nId;
+    m_rcImageRect=rcImageRect;
+    m_vSize.x = m_rcImageRect.width/m_fPixelsPerMeter;
+	m_vSize.y = m_rcImageRect.height/m_fPixelsPerMeter;
 }
 
 void NeapuEngine::Spirit::render(ID2D1HwndRenderTarget* pRenderTarget, const Camara* camara, std::map<int, Image*>& imageList)
 {
+    if(m_nImageId==-1) return GameObject::render(pRenderTarget, camara, imageList);
     Vector2 camaraPos = camara->m_vPosition;
     Vector2 displayPos = m_vPosition - camaraPos;
     D2D1_RECT_F desRc = D2D1::RectF(
@@ -42,4 +49,11 @@ void NeapuEngine::Spirit::render(ID2D1HwndRenderTarget* pRenderTarget, const Cam
         srcRc
     );
     GameObject::render(pRenderTarget, camara, imageList);
+}
+
+void Spirit::setPixelsPerMeter(float f) 
+{
+    m_fPixelsPerMeter=f;
+    m_vSize.x = m_rcImageRect.width/m_fPixelsPerMeter;
+	m_vSize.y = m_rcImageRect.height/m_fPixelsPerMeter;
 }

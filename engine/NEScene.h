@@ -14,6 +14,8 @@ public:
     String name() {return m_strName;}
     GameObject* rootGameObject() { return m_pRootGameObject; }
     void redner(ID2D1HwndRenderTarget* pRenderTarget, std::map<int, Image*>& imageList);
+    void tick();
+    void fixedTick();
 protected:
     GameObject* m_pRootGameObject;
     Camara* m_pCamara;
