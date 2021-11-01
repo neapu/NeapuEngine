@@ -37,8 +37,14 @@ void GameObject::tick()
 
 void GameObject::fixedTick() 
 {
-	Vector2 vVelocityTick = m_vVelocity/50;
-	m_vPosition = m_vPosition + vVelocityTick;
+	if(!m_vVelocity.isEmpty()){
+		Vector2 vVelocityTick = m_vVelocity/50;
+		m_vPosition = m_vPosition + vVelocityTick;
+	}
+	
+	for(auto item: m_ChildrenList){
+		item.second->fixedTick();
+	}
 }
 
 void GameObject::addChild(GameObject* pChild)

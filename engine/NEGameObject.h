@@ -20,12 +20,16 @@ public:
     String name() { return m_strName; }
     GameObject* child(const String& name) { return m_ChildrenList[name]; }
     void setVelocity(const Vector2& vel) {m_vVelocity=vel;}
+    void setVelocityX(float s) {m_vVelocity.x = s;}
+    void setVelocityY(float s) {m_vVelocity.y = s;}
     int layer() { return m_nLayer; }
     void setLayer(int nLayer) { m_nLayer = nLayer; }
+protected:
+    friend class Scene;
     virtual void render(ID2D1HwndRenderTarget* pRenderTarget, const Camara* camara, std::map<int, Image*>& imageList);
     virtual void tick();
     virtual void fixedTick();
-protected:
+
     void addChild(GameObject* pChild);
     void removeChild(GameObject* pChild);
     bool isKeyDown(unsigned long keyCode);

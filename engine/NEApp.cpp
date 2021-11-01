@@ -7,6 +7,7 @@
 #include "NEScene.h"
 #include <d2d1.h>
 #include <wincodec.h>
+#include <time.h>
 
 using namespace NeapuEngine;
 #define NE_ASSERT(b, msg) if(FAILED(b)){MessageBox(nullptr, msg, "error", 0);exit(-1);}
@@ -27,6 +28,7 @@ App::App(int argc, char** argv)
     , m_pRenderTarget(nullptr)
     , m_hwnd(nullptr)
     , m_pIWICFactory(nullptr)
+    , m_nTimerIdCount(0)
 {
     // g_pInstance = this;
     m_pInstance = this;
@@ -35,6 +37,7 @@ App::App(int argc, char** argv)
 
 bool App::isKeyDown(unsigned long keyCode) 
 {
+    // printf("%d", m_keyMap[keyCode]);
     return m_keyMap[keyCode]==1;
 }
 
@@ -76,9 +79,6 @@ int NeapuEngine::App::init()
 
 int App::run() 
 {
-    int n = SetTimer(nullptr, 1, 1000, [](HWND hwnd, UINT, UINT_PTR, DWORD){
-        int i=0;
-    });
     ShowWindow(m_hwnd, SW_SHOW);
     UpdateWindow(m_hwnd);
 
@@ -127,6 +127,23 @@ int App::addImage(String strPath)
     return -1;
 }
 
+int App::addTimer(long timeout, timerCallback cb) 
+{
+    int id = m_nTimerIdCount++;
+    m_Timers[id]={
+        id,
+        timeout,
+        clock(),
+        cb
+    };
+    return id;
+}
+
+void App::removeTimer(int id) 
+{
+    m_Timers.erase(id);
+}
+
 void App::onInit(HWND hWnd)
 {
     HRESULT hr = S_OK;
@@ -150,7 +167,10 @@ void App::onInit(HWND hWnd)
         IID_PPV_ARGS(&m_pIWICFactory)
     );
     NE_ASSERT(hr, "Create IWICFactory failed!");
-    
+    addTimer(20, [this]()->bool{
+        fixedTick();
+        return true;
+    });
 }
 
 void App::onRender(HWND hWnd)
@@ -167,6 +187,7 @@ void App::onResize(HWND hWnd)
 
 void App::tick() 
 {
+    updateTimers();
     if(m_pCurrentScene){
         m_pCurrentScene->tick();
     }
@@ -187,11 +208,6 @@ LRESULT App::widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:onInit(hWnd);  break;
     case WM_PAINT:onRender(hWnd);  break;
     case WM_SIZE:onResize(hWnd);  break;
-    case WM_TIMER:
-        if(wParam==1){
-            fixedTick();
-        }
-        break;
     case WM_KEYDOWN:{
         m_keyMap[wParam]=1;
     }break;
@@ -207,3 +223,12 @@ LRESULT App::widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+void App::updateTimers(){
+    for(auto item: m_Timers){
+        if(clock() - item.second.last > item.second.timeout){
+            if(!item.second.cb()){
+                m_Timers.erase(item.first);
+            }
+        }
+    }
+}

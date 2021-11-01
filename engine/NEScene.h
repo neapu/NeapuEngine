@@ -13,10 +13,12 @@ public:
     Scene(String strName);
     String name() {return m_strName;}
     GameObject* rootGameObject() { return m_pRootGameObject; }
+protected:
+    friend class App;
     void redner(ID2D1HwndRenderTarget* pRenderTarget, std::map<int, Image*>& imageList);
     void tick();
     void fixedTick();
-protected:
+
     GameObject* m_pRootGameObject;
     Camara* m_pCamara;
     String m_strName;

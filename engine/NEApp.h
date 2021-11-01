@@ -2,15 +2,17 @@
 #define __NEAPP_H__
 #include <Windows.h>
 #include <map>
+#include <set>
 #include "NEString.h"
 #include "export.h"
 #include "NEImage.h"
+#include <functional>
 #pragma warning(disable: 4251)//禁用stl实例类导出警告
 
 struct ID2D1Factory;
 struct ID2D1HwndRenderTarget;
 struct IWICImagingFactory;
-
+using timerCallback = std::function<bool()>;
 extern "C" LRESULT CALLBACK __WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 namespace NeapuEngine {
 class Scene;
@@ -25,6 +27,8 @@ public:
 public:
     bool addScene(Scene* scene);
     int addImage(String strPath);
+    int addTimer(long timeout, timerCallback cb);
+    void removeTimer(int id);
 
 protected:
     void onInit(HWND hWnd);
@@ -36,6 +40,7 @@ protected:
 private:
     LRESULT widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     friend LRESULT CALLBACK ::__WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    void updateTimers();
 private:
     int m_argc;
     char** m_argv;
@@ -52,6 +57,16 @@ private:
     //对应虚拟键码为1则为按下
     //虚拟键码：https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
     unsigned char m_keyMap[256];
+    //简单定时器
+    
+    int m_nTimerIdCount;
+    struct TimerInfo{
+        int id;
+        long timeout;
+        long last;
+        timerCallback cb;
+    };
+    std::map<int, TimerInfo> m_Timers;
 };
 // LRESULT __WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }

@@ -10,6 +10,7 @@ struct NEAPU_ENGINE_EXPORT Vector2{
     Vector2 operator-(const Vector2& v2);
     Vector2 operator*(float f);
     Vector2 operator/(float f);
+    bool isEmpty() {return (x==0.f&&y==0.f);}
 };
 }
 #endif // __NEVECTOR_H__
