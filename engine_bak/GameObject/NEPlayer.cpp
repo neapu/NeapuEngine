@@ -1,3 +1,4 @@
+#include "NEPlayer.h"
 #include "NECharacter.h"
 using namespace NeapuEngine;
 
@@ -8,11 +9,8 @@ using namespace NeapuEngine;
 #define DIR_HORIZONTAL 0x02
 #define DIR_VERTICAL   0x08
 
-Character::Character(String strName, GameObject* pParent) 
-    : Spirit(strName, pParent)
-    , m_MoveMode(MoveMode::Free)
-    , m_fHorizontalSpeed(1)
-    , m_fVerticalSpeed(1)
+Player::Player(String strName, GameObject* pParent)
+    : Character(strName, pParent)
     , m_nKeyLeft(0x25)
     , m_nKeyUp(0x26)
     , m_nKeyRight(0x27)
@@ -21,7 +19,7 @@ Character::Character(String strName, GameObject* pParent)
     
 }
 
-void Character::fixedTick() 
+void Player::fixedTick() 
 {
     /*要实现这么一个效果
 	* 按住左反向键的同时按右方向键
@@ -144,5 +142,4 @@ void Character::fixedTick()
             setVelocity(v);
         }
     }
-    
 }
