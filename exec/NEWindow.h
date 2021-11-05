@@ -1,11 +1,11 @@
 #ifndef __NEWINDOW_H__
 #define __NEWINDOW_H__
+#include "NEGame.h"
 #include <Windows.h>
 extern "C" LRESULT CALLBACK __WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-struct ID2D1Factory;
-struct ID2D1HwndRenderTarget;
-struct IWICImagingFactory;
+
 namespace NeapuEngine{
+class Renderer;
 class Window{
 public:
     Window(int argc, char** argv);
@@ -28,9 +28,9 @@ private:
     //对应虚拟键码为1则为按下
     //虚拟键码：https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
     unsigned char m_keyMap[256];
-    ID2D1Factory* m_pFactory;
-    ID2D1HwndRenderTarget* m_pRenderTarget;
-    IWICImagingFactory* m_pIWICFactory;
+    
+    Game* m_pGameInstance;
+    Renderer* m_pRenderer;
 };
 }
 #endif // __NEWINDOW_H__

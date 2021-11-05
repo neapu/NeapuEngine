@@ -1,7 +1,9 @@
 #include "NEWindow.h"
+#include <libloaderapi.h>
+#include <minwindef.h>
 #include <stdio.h>
-#include <d2d1.h>
-#include <wincodec.h>
+#include <functional>
+#include "NERenderer.h"
 using namespace NeapuEngine;
 #define NE_ASSERT(b, msg) if(FAILED(b)){MessageBox(nullptr, msg, "error", 0);exit(-1);}
 
@@ -16,6 +18,8 @@ Window::Window(int argc, char** argv)
     : m_argc(argc)
     , m_argv(argv)
     , m_hwnd(nullptr)
+    , m_pGameInstance(nullptr)
+    , m_pRenderer(new Renderer())
 {
     m_pInstance=this;
 }
@@ -41,33 +45,31 @@ LRESULT Window::widgetProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-void Window::onWindowInit(HWND hWnd) 
+void Window::onRender(HWND hWnd) 
 {
-    HRESULT hr = S_OK;
-    hr = CoInitialize(nullptr);
-    NE_ASSERT(hr, "CoInitialize failed!");
-    hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pFactory);
-    NE_ASSERT(hr, "Create factory failed!");
-    RECT rc;
-    GetClientRect(hWnd, &rc);
-    D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-    hr = m_pFactory->CreateHwndRenderTarget(
-        D2D1::RenderTargetProperties(),
-        D2D1::HwndRenderTargetProperties(hWnd, size),
-        &m_pRenderTarget
-    );
-    NE_ASSERT(hr, "Create Render Target failed!");
-    hr = CoCreateInstance(
-        CLSID_WICImagingFactory,
-        NULL,
-        CLSCTX_INPROC_SERVER,
-        IID_PPV_ARGS(&m_pIWICFactory)
-    );
-    NE_ASSERT(hr, "Create IWICFactory failed!");
+    m_pRenderer->render(m_pGameInstance->currentScene());
 }
 
+void Window::onWindowInit(HWND hWnd) 
+{
+    
+}
+
+typedef Game*(*gameInstanceFunc)();
 int Window::init() 
 {
+    HINSTANCE hDll = LoadLibrary("Game.dll");
+    if(!hDll){
+        fprintf(stderr, "Load Game.dll Error\n");
+        return -1;
+    }
+    // using gameInstanceFunc = std::function<Game*()>;
+    gameInstanceFunc gameInstance = (gameInstanceFunc)(GetProcAddress(hDll, "gameInstance"));
+    if(!gameInstance){
+        return -2;
+    }
+    m_pGameInstance = gameInstance();
+
     char szWindowClass[128] = "NEWidget";
     //注册窗口类
     WNDCLASSEXA wcex;

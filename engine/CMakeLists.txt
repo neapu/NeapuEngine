@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(NeapuEngine CXX)
+# set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(Public GameObject Scene)
 file(GLOB_RECURSE SRC_FILES "*.cpp")
 file(GLOB_RECURSE HEAD_FILES "*.h")

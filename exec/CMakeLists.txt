@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(NeapuEngineExec CXX)
-include_directories("../engine")
+set(ENGINE_DIR "../engine")
+include_directories(${ENGINE_DIR}/gameobject ${ENGINE_DIR}/public)
 file(GLOB_RECURSE SRC_FILES "*.cpp")
 add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 target_link_libraries(${PROJECT_NAME} d2d1 windowscodecs dwrite)
