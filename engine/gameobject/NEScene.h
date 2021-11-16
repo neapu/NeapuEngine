@@ -7,6 +7,7 @@ namespace NeapuEngine {
 class Scene: public GameObject{
 public:
     Scene(String strName, GameObject* pParent = nullptr);
+    Camara* getCamara() { return &m_Camara; }
 protected:
     Camara m_Camara;
 };

@@ -29,13 +29,33 @@ void Renderer::init(HWND hWnd)
         IID_PPV_ARGS(&m_pIWICFactory)
     );
     NE_ASSERT(hr, "Create IWICFactory failed!");
+    m_hWnd = hWnd;
 }
 
 void Renderer::render(Scene* pScene) 
 {
-    pScene->onRender([this](GameObject* pGameObject, void* ptr){
-        Spirit *pSpirt = dynamic_cast<Spirit*>(pGameObject);
-        
+    Camara* pCamara = pScene->getCamara();
+    RECT rc;
+    GetClientRect(m_hWnd, &rc);
+    //每米像素数=窗口大小(像素)/摄像机大小(米)
+    float fPixelPreUnitX = rc.right / pCamara->getSize().x;
+    float fPixelPreUnitY = rc.bottom / pCamara->getSize().y;
+    Vector2 vCamaraPos = pCamara->getPosition();
+    pScene->onRender([&, this](GameObject* pGameObject, void* ptr){
+        Spirit *pSpirit = dynamic_cast<Spirit*>(pGameObject);
+        if (pSpirit) {
+            Vector2 vDisplayPos = pSpirit->position() - vCamaraPos;
+            //游戏坐标转换成窗口坐标
+            D2D1_RECT_F desRc = D2D1::RectF(
+                vDisplayPos.x * fPixelPreUnitX,
+                rc.right - vDisplayPos.y * fPixelPreUnitY,//笛卡尔坐标系的Y轴和窗口坐标系的Y轴是相反的
+                vDisplayPos.x * fPixelPreUnitX + pSpirit->size().x * fPixelPreUnitX,
+                (rc.right - vDisplayPos.y * fPixelPreUnitY) + pSpirit->size().y * fPixelPreUnitY
+            );
+            int nImgId = pSpirit->imageId();
+            Image* img = this->getImage(pSpirit->imageId());
+            if (!img)return;
+        }
     }, nullptr);
 }
 
@@ -49,4 +69,12 @@ void Renderer::loadImage(std::map<int, String> imageList)
             delete img;
         }
     }
+}
+
+Image* NeapuEngine::Renderer::getImage(int nId)
+{
+    if (m_ImageList.find(nId) == m_ImageList.end()) {
+        return nullptr;
+    }
+    return m_ImageList.at(nId);
 }

@@ -20,7 +20,7 @@ NeapuEngine::GameObject::~GameObject()
 
 void GameObject::onRender(RenderFunc rf, void* ptr) 
 {
-	rf(this, ptr);
+	rf(this, nullptr, ptr);
 	for (auto& item : m_ChildLayers) {
 		for (auto child : item.second) {
 			child->onRender(rf, ptr);

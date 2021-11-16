@@ -13,11 +13,13 @@ public:
     void init(HWND hWnd);
     void render(Scene* pScene);
     void loadImage(std::map<int, String> imageList);
+    Image* getImage(int nId);
 private:
     ID2D1Factory* m_pFactory;
     ID2D1HwndRenderTarget* m_pRenderTarget;
     IWICImagingFactory* m_pIWICFactory;
     std::map<int, Image*> m_ImageList;
+    HWND m_hWnd;
 };
 }
 #endif // __NERENDERER_H__

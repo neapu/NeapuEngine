@@ -1,4 +1,5 @@
 #include "NESpirit.h"
+#include "NECamara.h"
 using namespace NeapuEngine;
 
 Spirit::Spirit(String strName, GameObject* pParent)

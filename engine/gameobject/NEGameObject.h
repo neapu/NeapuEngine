@@ -23,8 +23,8 @@ public:
     void setVelocityY(float s) {m_vVelocity.y = s;}
     int layer() { return m_nLayer; }
     void setLayer(int nLayer) { m_nLayer = nLayer; }
-    using RenderFunc = std::function<void(GameObject* pGameObject, Camara* pCamara, void* ptr)>;
-    void onRender(RenderFunc rf, void* ptr);
+    using RenderFunc = std::function<void(GameObject* pGameObject, void* ptr)>;
+    virtual void onRender(RenderFunc rf, void* ptr);
 protected:
     virtual void tick();
     virtual void fixedTick();
@@ -35,7 +35,7 @@ protected:
 
 protected:
     String m_strName;
-    Vector2 m_vPosition;//左上角位置
+    Vector2 m_vPosition;//物体定位点，物体左下角与父元素左下角的相对位置(笛卡尔坐标系)
     Vector2 m_vSize;//宽高
     Vector2 m_vVelocity;//速度
     GameObject* m_pParent;
